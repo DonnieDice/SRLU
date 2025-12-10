@@ -1,3 +1,7 @@
+## v2.1.3 - TOC BUMP
+
+- Updated - toc bump - [*.toc]
+
 ## v2.1.1 - Simplified Commands & Performance Update
 
 - Updated - Simplified command structure with direct sound selection [core.lua]

@@ -1,101 +1,212 @@
-name: Deploy and Notify
+name: Package and Release
 
 on:
-  release:
-    types: [published]
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version number for manual deployment'
-        required: true
-        type: string
+  push:
+    tags:
+      - 'v*'  # Triggers only on version tags like v1.0.0, v1.0.0-alpha, etc.
+
+env:
+  CF_API_KEY: ${{ secrets.CF_API_KEY }}
+  WOWI_API_TOKEN: ${{ secrets.WOWI_API_TOKEN }}
+  WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
+  GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
-  notify-discord:
+  release:
     runs-on: ubuntu-latest
-    
+    permissions:
+      contents: write
     steps:
-      - name: Checkout code
+      - name: Clone Project
         uses: actions/checkout@v4
-      
-      - name: Get release information
-        id: release_info
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git user
         run: |
-          if [ "${{ github.event_name }}" == "release" ]; then
-            echo "version=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
-            
-            # Handle multi-line body properly
-            BODY=$(echo "${{ github.event.release.body }}" | head -c 500 | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
-            echo "body=$BODY" >> $GITHUB_OUTPUT
-            
-            echo "url=${{ github.event.release.html_url }}" >> $GITHUB_OUTPUT
-            echo "name=${{ github.event.release.name }}" >> $GITHUB_OUTPUT
+          git config --global user.name "donniedice"
+          git config --global user.email "donniedice@protonmail.com"
+
+      - name: Set Release Type
+        id: set_release_type
+        run: |
+          TAG_NAME=${{ github.ref }}
+          if [[ "$TAG_NAME" == *"beta"* ]]; then
+            echo "release_type=beta" >> $GITHUB_OUTPUT
+          elif [[ "$TAG_NAME" == *"alpha"* ]]; then
+            echo "release_type=alpha" >> $GITHUB_OUTPUT
           else
-            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
-            echo "body=Manual deployment triggered" >> $GITHUB_OUTPUT
-            echo "url=${{ github.server_url }}/${{ github.repository }}" >> $GITHUB_OUTPUT
-            echo "name=SRLU ${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+            echo "release_type=release" >> $GITHUB_OUTPUT
           fi
-      
-      - name: Send Discord notification
+
+      - name: Extract Version from TOC
+        id: extract_version
+        run: |
+          # Try to get version from TOC file, fallback to tag name
+          if [ -f "SRLU.toc" ]; then
+            version=$(grep -E "^## Version:" SRLU.toc | awk '{print $3}')
+            if [ -z "$version" ]; then
+              version="${{ github.ref_name }}"
+            fi
+          else
+            version="${{ github.ref_name }}"
+          fi
+          echo "Extracted version: $version"
+          echo "version=$version" >> $GITHUB_OUTPUT
+
+      - name: Extract Changelog
+        id: extract_changelog
+        run: |
+          if [ -f "docs/CHANGES.md" ]; then
+            # Read the changelog and properly escape it for JSON
+            CHANGELOG=$(cat docs/CHANGES.md | head -20 | jq -Rs .)
+            echo "changelog=$CHANGELOG" >> $GITHUB_OUTPUT
+          else
+            echo "changelog=\"No changelog available\"" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Package and Release
+        uses: BigWigsMods/packager@master
+        with:
+          release-type: ${{ steps.set_release_type.outputs.release_type }}
+
+      - name: Send Discord Notification
+        if: success()
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: |
-          # Create RGX Mods standard Discord message
+          if [ -z "$DISCORD_WEBHOOK" ]; then
+            echo "Discord webhook not configured, skipping notification"
+            exit 0
+          fi
+          
+          # Determine release type emoji and color
+          RELEASE_TYPE="${{ steps.set_release_type.outputs.release_type }}"
+          if [ "$RELEASE_TYPE" = "alpha" ]; then
+            EMOJI="🔬"
+            TYPE_TEXT=" Alpha"
+            COLOR=16711680
+          elif [ "$RELEASE_TYPE" = "beta" ]; then
+            EMOJI="🧪"
+            TYPE_TEXT=" Beta"
+            COLOR=16744448
+          else
+            EMOJI="🗡️"
+            TYPE_TEXT=""
+            COLOR=9132843
+          fi
+          
+          # Get version - use tag name as fallback
+          VERSION="${{ steps.extract_version.outputs.version }}"
+          if [ -z "$VERSION" ]; then
+            VERSION="${{ github.ref_name }}"
+          fi
+          
+          # Get the changelog (already JSON-escaped from previous step)
+          CHANGELOG='${{ steps.extract_changelog.outputs.changelog }}'
+          
+          # Build the JSON payload using jq for proper escaping
+          JSON_PAYLOAD=$(jq -n \
+            --arg emoji "$EMOJI" \
+            --arg type_text "$TYPE_TEXT" \
+            --arg version "$VERSION" \
+            --arg tag "${{ github.ref_name }}" \
+            --argjson changelog "$CHANGELOG" \
+            --argjson color "$COLOR" \
+            '{
+              "content": "",
+              "username": "SRLU Release",
+              "avatar_url": "https://raw.githubusercontent.com/donniedice/SRLU/main/images/SRLU_logo_400x400.png",
+              "embeds": [{
+                "title": "\($emoji) SRLU | Skyrim Level-Up! - \($version)\($type_text)",
+                "description": "**Fus Ro Dah!** A new version of SRLU has been released!\n\n🎵 **What'\''s New:**\n\($changelog)\n\n**Transform your WoW leveling experience with the iconic Skyrim level-up sound!**",
+                "url": "https://github.com/donniedice/SRLU/releases/tag/\($tag)",
+                "color": $color,
+                "thumbnail": {
+                  "url": "https://raw.githubusercontent.com/donniedice/SRLU/main/images/SRLU_logo_400x400.png"
+                },
+                "fields": [
+                  {
+                    "name": "📥 Downloads",
+                    "value": "[CurseForge](https://www.curseforge.com/wow/addons/srlu)\n[Wago.io](https://addons.wago.io/addons/srlu)\n[GitHub](https://github.com/donniedice/SRLU)",
+                    "inline": true
+                  },
+                  {
+                    "name": "🎮 Compatibility",
+                    "value": "✅ The War Within\n✅ Classic Era\n✅ Cataclysm\n✅ MoP",
+                    "inline": true
+                  },
+                  {
+                    "name": "💬 Support",
+                    "value": "[Join Discord](https://discord.gg/N7kdKAHVVF)\n[Report Issues](https://github.com/donniedice/SRLU/issues)",
+                    "inline": true
+                  }
+                ],
+                "footer": {
+                  "text": "RGX Mods - RealmGX Community",
+                  "icon_url": "https://raw.githubusercontent.com/donniedice/SimpleQuestPlates/main/images/kiwi.gif"
+                },
+                "timestamp": "'$(date -u +%Y-%m-%dT%H:%M:%S.000Z)'"
+              }]
+            }')
+          
+          echo "Sending Discord notification..."
+          echo "Version: $VERSION"
+          
+          # Send to Discord
           curl -H "Content-Type: application/json" \
                -X POST \
-               -d "{
-                 \"content\": \"\",
-                 \"username\": \"SRLU Update\",
-                 \"avatar_url\": \"https://raw.githubusercontent.com/donniedice/SRLU/main/images/SRLU_logo_400x400.png\",
-                 \"embeds\": [{
-                   \"title\": \"🗡️ SRLU | Skyrim Level-Up! - ${{ steps.release_info.outputs.version }}\",
-                   \"description\": \"**Fus Ro DAH!** - A new version of SRLU has been released!\\n\\n🎵 **What's New:**\\n• Documentation overhaul with RGX Mods Brand Standards\\n• Discord webhook notifications\\n• Complete CurseForge description\\n• Updated README with proper formatting\\n\\n**Transform your WoW leveling experience with the iconic Skyrim level-up sound!**\",
-                   \"url\": \"${{ steps.release_info.outputs.url }}\",
-                   \"color\": 9132843,
-                   \"thumbnail\": {
-                     \"url\": \"https://raw.githubusercontent.com/donniedice/SRLU/main/images/SRLU_logo_400x400.png\"
-                   },
-                   \"fields\": [
-                     {
-                       \"name\": \"📥 Downloads\",
-                       \"value\": \"[CurseForge](https://www.curseforge.com/wow/addons/srlu)\\n[Wago.io](https://addons.wago.io/addons/srlu)\\n[GitHub](https://github.com/donniedice/SRLU)\",
-                       \"inline\": true
-                     },
-                     {
-                       \"name\": \"🎮 Compatibility\",
-                       \"value\": \"✅ The War Within\\n✅ Classic Era\\n✅ Cataclysm\\n✅ MoP\",
-                       \"inline\": true
-                     },
-                     {
-                       \"name\": \"💬 Support\",
-                       \"value\": \"[Join Discord](https://discord.gg/hK9N3esnce)\\n[Report Issues](https://github.com/donniedice/SRLU/issues)\",
-                       \"inline\": true
-                     }
-                   ],
-                   \"footer\": {
-                     \"text\": \"RGX Mods - RealmGX Community\",
-                     \"icon_url\": \"https://raw.githubusercontent.com/donniedice/SimpleQuestPlates/main/images/kiwi.gif\"
-                   },
-                   \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%S.000Z)\"
-                 }]
-               }" \
+               -d "$JSON_PAYLOAD" \
                "$DISCORD_WEBHOOK"
-      
-      - name: Deploy to CurseForge
-        if: github.event_name == 'release'
+
+      - name: Send Discord Failure Notification
+        if: failure()
         env:
-          CURSEFORGE_API_TOKEN: ${{ secrets.CURSEFORGE_API_TOKEN }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: |
-          echo "CurseForge deployment would happen here"
-          echo "This step requires the CurseForge API token to be configured"
-          # Add actual CurseForge deployment logic here when API token is available
-      
-      - name: Deploy to Wago
-        if: github.event_name == 'release'
-        env:
-          WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
-        run: |
-          echo "Wago deployment would happen here"
-          echo "This step requires the Wago API token to be configured"
-          # Add actual Wago deployment logic here when API token is available
+          if [ -z "$DISCORD_WEBHOOK" ]; then
+            echo "Discord webhook not configured, skipping notification"
+            exit 0
+          fi
+          
+          VERSION="${{ steps.extract_version.outputs.version }}"
+          if [ -z "$VERSION" ]; then
+            VERSION="Unknown"
+          fi
+          
+          JSON_PAYLOAD=$(jq -n \
+            --arg version "$VERSION" \
+            --arg run_id "${{ github.run_id }}" \
+            '{
+              "content": "",
+              "username": "SRLU Build Failed",
+              "avatar_url": "https://raw.githubusercontent.com/donniedice/SRLU/main/images/SRLU_logo_400x400.png",
+              "embeds": [{
+                "title": "❌ SRLU Build Failed",
+                "description": "The release workflow encountered an error",
+                "url": "https://github.com/donniedice/SRLU/actions/runs/\($run_id)",
+                "color": 15158332,
+                "fields": [
+                  {
+                    "name": "Version",
+                    "value": $version,
+                    "inline": true
+                  },
+                  {
+                    "name": "Workflow",
+                    "value": "[View Logs](https://github.com/donniedice/SRLU/actions/runs/\($run_id))",
+                    "inline": true
+                  }
+                ],
+                "footer": {
+                  "text": "RGX Mods - Build System",
+                  "icon_url": "https://raw.githubusercontent.com/donniedice/SimpleQuestPlates/main/images/kiwi.gif"
+                },
+                "timestamp": "'$(date -u +%Y-%m-%dT%H:%M:%S.000Z)'"
+              }]
+            }')
+          
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d "$JSON_PAYLOAD" \
+               "$DISCORD_WEBHOOK"

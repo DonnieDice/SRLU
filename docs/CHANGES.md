@@ -1,8 +1,1 @@
-- Added support for multiple sound quality levels (high/med/low)
-- Updated sound file paths to use separate files for each quality level:
-  - `SRLU_high.ogg` for high quality
-  - `SRLU_med.ogg` for medium quality (default)
-  - `SRLU_low.ogg` for low quality
-- Commands `/srlu high`, `/srlu med`, and `/srlu low` now properly switch between different sound files
-- Updated CLAUDE.md documentation to reflect multiple sound file support
-- Updated *.toc to support multiple WoW clients with single toc
+- Re-added Vanilla toc

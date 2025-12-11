@@ -10,7 +10,9 @@ SRLU (Skyrim Level-Up!) is a professional World of Warcraft addon that plays the
 
 - **data/core.lua**: Main addon functionality with advanced features
 - **data/locales.lua**: Multi-language support (English, Russian, German, French, Spanish)
-- **sounds/SRLU.ogg**: Custom Skyrim level-up sound file
+- **sounds/SRLU_high.ogg**: High quality Skyrim level-up sound
+- **sounds/SRLU_med.ogg**: Medium quality Skyrim level-up sound
+- **sounds/SRLU_low.ogg**: Low quality Skyrim level-up sound
 - **images/**: Addon icon and logo assets
 - **SRLU.toc**: TOC file for retail WoW (The War Within)
 - **SRLU_Cata.toc**: TOC file for Classic Cataclysm
@@ -69,9 +71,15 @@ Use `/srlu` followed by various commands for full functionality:
 - `/srlu test` - Play test sound
 - `/srlu enable` - Enable addon
 - `/srlu disable` - Disable addon (unmutes default sound)
-- `/srlu high` - Use high quality sound
-- `/srlu med` - Use medium quality sound
-- `/srlu low` - Use low quality sound
+- `/srlu high` - Use high quality sound (SRLU_high.ogg)
+- `/srlu med` - Use medium quality sound (SRLU_med.ogg) [DEFAULT]
+- `/srlu low` - Use low quality sound (SRLU_low.ogg)
+
+**Sound Quality System**:
+- The addon supports three sound quality levels via separate .ogg files
+- Users can switch between quality levels at runtime using slash commands
+- The selected quality is persisted in SavedVariables
+- Default quality is "medium" if not previously set
 
 ### **Error Handling**:
 - **pcall Protection**: All major functions wrapped in pcall
@@ -92,7 +100,10 @@ Use `/srlu` followed by various commands for full functionality:
 
 ## File Paths and Compatibility
 
-- **Sound Path**: `Interface\\AddOns\\SRLU\\sounds\\SRLU.ogg` (corrected from v2.0.x)
+- **Sound Paths**:
+  - High quality: `Interface\\AddOns\\SRLU\\sounds\\SRLU_high.ogg`
+  - Medium quality: `Interface\\AddOns\\SRLU\\sounds\\SRLU_med.ogg`
+  - Low quality: `Interface\\AddOns\\SRLU\\sounds\\SRLU_low.ogg`
 - **Icon Path**: `Interface\\AddOns\\SRLU\\images\\icon`
 - **Compatibility**: Retail, Classic Era, Cataclysm Classic, and Mists of Pandaria
 

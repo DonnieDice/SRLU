@@ -70,16 +70,6 @@
 
 ---
 
-## <span style="color:#8B4513">🆕 Version 2.1.2 Updates</span>
-
-- <span style="color:#2dc26b">🛠️ **Simplified Commands**</span> <span style="color:#e67e23">- Direct sound selection without menus</span>
-- <span style="color:#2dc26b">⚡ **Performance Boost**</span> <span style="color:#e67e23">- Optimized code throughout</span>  
-- <span style="color:#2dc26b">🔇 **Auto-Unmute**</span> <span style="color:#e67e23">- Restores default sound when disabling</span>
-- <span style="color:#2dc26b">🇷🇺 **Russian Language**</span> <span style="color:#e67e23">- Added by ZamestoTV (Hubbotu)</span>
-- <span style="color:#2dc26b">🛡️ **Better Errors**</span> <span style="color:#e67e23">- Enhanced error management</span>
-
----
-
 ## <span style="color:#8B4513">📋 Compatibility</span>
 
 | Version | Interface | Status |

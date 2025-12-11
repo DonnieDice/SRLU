@@ -14,9 +14,9 @@ local ADDON_VERSION = "2.1.2"
 local ADDON_NAME = "SRLU"
 local ICON_PATH = "|Tinterface/addons/SRLU/images/icon:16:16|t"
 local SOUND_PATHS = {
-    high = "Interface\\Addons\\SRLU\\sounds\\SRLU.ogg",
-    medium = "Interface\\Addons\\SRLU\\sounds\\SRLU.ogg",
-    low = "Interface\\Addons\\SRLU\\sounds\\SRLU.ogg"
+    high = "Interface\\Addons\\SRLU\\sounds\\SRLU_high.ogg",
+    medium = "Interface\\Addons\\SRLU\\sounds\\SRLU_med.ogg",
+    low = "Interface\\Addons\\SRLU\\sounds\\SRLU_low.ogg"
 }
 local DEFAULT_SOUND_ID = 569593
 

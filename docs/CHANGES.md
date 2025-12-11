@@ -1,60 +1,8 @@
-## v2.1.6 - TOC BUMP
-
-- Updated - toc bump - [*.toc]
-
-## v2.1.1 - Simplified Commands & Performance Update
-
-- Updated - Simplified command structure with direct sound selection [core.lua]
-- Added - Auto-unmute default sound when disabling addon [core.lua]
-- Added - Russian localization by ZamestoTV (Hubbotu) [locales.lua]
-- Updated - TOC files with proper formatting and color codes [All TOC files]
-- Removed - Unnecessary complex commands for cleaner UX [core.lua, locales.lua]
-- Enhanced - Performance optimizations throughout codebase [core.lua]
-- Fixed - Localization initialization issues [locales.lua]
-- Updated - README with simplified command documentation [README.md]
-- Updated - CLAUDE.md with current architecture details [CLAUDE.md]
-
-## v2.1.0 - Major Feature Enhancement Release
-
-- Added - Complete slash command system with /srlu interface [core.lua]
-- Added - Persistent settings via SavedVariables system [SRLUSettings]
-- Added - Multi-language support for English, German, French, Spanish [locales.lua]
-- Added - Sound variant selection (high/medium/low quality) [core.lua]
-- Added - Professional error handling with pcall protection [core.lua]
-- Added - Mists of Pandaria support [SRLU_Mists.toc]
-- Added - Performance optimizations with cached constants [core.lua]
-- Added - Type validation for all user inputs [core.lua]
-- Added - Icon display for all addon output [core.lua]
-- Added - Comprehensive help and status commands [core.lua]
-- Updated - Code architecture with object-oriented design [core.lua]
-- Updated - Memory efficiency through string caching [core.lua]
-- Updated - Event handling with optimized early returns [core.lua]
-- Updated - Email address to donniedice@protonmail.com [All TOC files]
-- Updated - TOC files to v2.1.0 with enhanced descriptions [All TOC files]
-- Updated - Welcome message with clean, professional display [core.lua]
-- Enhanced - Sound management with better error handling [core.lua]
-- Enhanced - Settings system with default value fallbacks [core.lua]
-- Enhanced - User experience with consistent visual branding [core.lua]
-- Restructured - Global namespace management for better organization [core.lua]
-- Restructured - Constants management for performance optimization [core.lua]
-- Fixed - Sound file path from incorrect to proper AddOns directory structure [core.lua]
-- Removed - Redundant help message from welcome display [core.lua]
-- Removed - Global variable pollution through proper scoping [core.lua]
-
-## v2.0.7 - Previous Release
-
-- Updated - Retail TOC to reflect version 110100 [SRLU.toc]
-- Updated - Retail BLU version number to v2.0.7 in TOC [SRLU.toc]
-- Removed - Version number from TOC title (Blizzard added this to the default interface) [SRLU.toc]
-- Updated - Email address in Retail TOC [SRLU.toc]
-- Updated - Name in notes to 'donniedice' instead of character name [SRLU.toc]
-- Updated - Vanilla TOC to reflect version 11506 [SRLU_Vanilla.toc]
-- Updated - Vanilla BLU version number to v2.0.7 in TOC [SRLU_Vanilla.toc]
-- Updated - Email address in Vanilla TOC [SRLU_Vanilla.toc]
-- Updated - Name in notes to 'donniedice' instead of character name [SRLU_Vanilla.toc]
-- Updated - Cata TOC to reflect version 40402 [SRLU_Cata.toc]
-- Updated - Cata BLU version number to v2.0.7 in TOC [SRLU_Cata.toc]
-- Updated - Email address in Cata TOC [SRLU_Cata.toc]
-- Updated - Name in notes to 'donniedice' instead of character name [SRLU_Cata.toc]
-- Updated - CHANGES.md [CHANGES.md]
-- Updated - changelog.txt [changelog.txt]
+- Added support for multiple sound quality levels (high/med/low)
+- Updated sound file paths to use separate files for each quality level:
+  - `SRLU_high.ogg` for high quality
+  - `SRLU_med.ogg` for medium quality (default)
+  - `SRLU_low.ogg` for low quality
+- Commands `/srlu high`, `/srlu med`, and `/srlu low` now properly switch between different sound files
+- Updated CLAUDE.md documentation to reflect multiple sound file support
+- Updated *.toc to support multiple WoW clients with single toc

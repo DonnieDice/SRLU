@@ -116,19 +116,19 @@ jobs:
             '{
               "content": "",
               "username": "SRLU Release",
-              "avatar_url": "https://raw.githubusercontent.com/donniedice/SRLU/main/images/SRLU_logo_400x400.png",
+              "avatar_url": "https://raw.githubusercontent.com/donniedice/SkyrimLevelUp/main/images/SRLU_logo_400x400.png",
               "embeds": [{
                 "title": "\($emoji) SRLU | Skyrim Level-Up! - \($version)\($type_text)",
                 "description": "**Fus Ro Dah!** A new version of SRLU has been released!\n\n🎵 **What'\''s New:**\n\($changelog)\n\n**Transform your WoW leveling experience with the iconic Skyrim level-up sound!**",
-                "url": "https://github.com/donniedice/SRLU/releases/tag/\($tag)",
+                "url": "https://github.com/donniedice/SkyrimLevelUp/releases/tag/\($tag)",
                 "color": $color,
                 "thumbnail": {
-                  "url": "https://raw.githubusercontent.com/donniedice/SRLU/main/images/SRLU_logo_400x400.png"
+                  "url": "https://raw.githubusercontent.com/donniedice/SkyrimLevelUp/main/images/SRLU_logo_400x400.png"
                 },
                 "fields": [
                   {
                     "name": "📥 Downloads",
-                    "value": "[CurseForge](https://www.curseforge.com/wow/addons/srlu)\n[Wago.io](https://addons.wago.io/addons/srlu)\n[GitHub](https://github.com/donniedice/SRLU)",
+                    "value": "[CurseForge](https://www.curseforge.com/wow/addons/srlu)\n[Wago.io](https://addons.wago.io/addons/srlu)\n[GitHub](https://github.com/donniedice/SkyrimLevelUp)",
                     "inline": true
                   },
                   {
@@ -138,7 +138,7 @@ jobs:
                   },
                   {
                     "name": "💬 Support",
-                    "value": "[Join Discord](https://discord.gg/N7kdKAHVVF)\n[Report Issues](https://github.com/donniedice/SRLU/issues)",
+                    "value": "[Join Discord](https://discord.gg/N7kdKAHVVF)\n[Report Issues](https://github.com/donniedice/SkyrimLevelUp/issues)",
                     "inline": true
                   }
                 ],
@@ -180,11 +180,11 @@ jobs:
             '{
               "content": "",
               "username": "SRLU Build Failed",
-              "avatar_url": "https://raw.githubusercontent.com/donniedice/SRLU/main/images/SRLU_logo_400x400.png",
+              "avatar_url": "https://raw.githubusercontent.com/donniedice/SkyrimLevelUp/main/images/SRLU_logo_400x400.png",
               "embeds": [{
                 "title": "❌ SRLU Build Failed",
                 "description": "The release workflow encountered an error",
-                "url": "https://github.com/donniedice/SRLU/actions/runs/\($run_id)",
+                "url": "https://github.com/donniedice/SkyrimLevelUp/actions/runs/\($run_id)",
                 "color": 15158332,
                 "fields": [
                   {
@@ -194,7 +194,7 @@ jobs:
                   },
                   {
                     "name": "Workflow",
-                    "value": "[View Logs](https://github.com/donniedice/SRLU/actions/runs/\($run_id))",
+                    "value": "[View Logs](https://github.com/donniedice/SkyrimLevelUp/actions/runs/\($run_id))",
                     "inline": true
                   }
                 ],

@@ -1,0 +1,15 @@
+package-as: SkyrimLevelUp
+manual-changelog: docs/CHANGES.md
+ignore:
+  - .github
+  - .gitignore
+  - .pkgmeta
+  - README.md
+  - AGENTS.md
+  - CLAUDE.md
+  - GEMINI.md
+  - .claude
+  - .claude-code-router
+  - docs/changelogs
+  - docs/description.html
+  - docs/description.md

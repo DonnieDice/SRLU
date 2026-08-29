@@ -129,4 +129,3 @@ The addon is distributed on:
 - CurseForge (Project ID: 594118)
 - GitHub
 - Wago.io (ID: J96EkaGg)
-- WoWInterface (ID: 26265)
